@@ -2,6 +2,8 @@ import { config } from "./config.js";
 import { ContactInterface, RoomInterface } from "wechaty/impls";
 import { Message } from "wechaty";
 import {sendMessage} from "./chatgpt.js";
+import { IMessage } from "./interface";
+
 enum MessageType {
   Unknown = 0,
 
@@ -22,6 +24,9 @@ enum MessageType {
   Video = 15, // Video(4), Video(43)
   Post = 16, // Moment, Channel, Tweet, etc
 }
+
+const conversationMap =  new Map()
+const messageMap: Map<string, IMessage[]> = new Map()
 
 const SINGLE_MESSAGE_MAX_SIZE = 500;
 export class ChatGPTBot {
@@ -64,7 +69,7 @@ export class ChatGPTBot {
     // remove more text via - - - - - - - - - - - - - - -
     return text
   }
-  async getGPTMessage(text: string): Promise<string> {
+  async getGPTMessage(text: IMessage[]): Promise<string> {
     return await sendMessage(text);
   }
   // The message is segmented according to its size
@@ -124,9 +129,25 @@ export class ChatGPTBot {
     );
   }
 
+
+
+
   async onPrivateMessage(talker: ContactInterface, text: string) {
     const talkerId = talker.id;
-    const gptMessage = await this.getGPTMessage(text);
+    let messageList=messageMap.get(talkerId)
+    if (!messageList) {
+       messageList= [];
+    }
+    messageList.push({"role": "user", "content": text})
+    let gptMessage = await this.getGPTMessage(messageList);
+    gptMessage=gptMessage.trim()
+    if (gptMessage!='网络异常'){
+      messageList.push({"role": "assistant", "content": gptMessage})
+      if (messageList.length>8){
+        messageList.shift();
+      }
+      messageMap.set(talkerId,messageList)
+    }
     await this.trySay(talker, gptMessage);
   }
 
@@ -135,7 +156,20 @@ export class ChatGPTBot {
     text: string,
     room: RoomInterface
   ) {
-    const gptMessage = await this.getGPTMessage(text);
+    let messageList=messageMap.get(room.id+talker.id)
+    if (!messageList) {
+      messageList= [];
+    }
+    messageList.push({"role": "user", "content": text})
+    let gptMessage = await this.getGPTMessage(messageList);
+    gptMessage=gptMessage.trim()
+    if (gptMessage!='网络异常'){
+      messageList.push({"role": "assistant", "content": gptMessage})
+      if (messageList.length>8){
+        messageList.shift();
+      }
+      messageMap.set(room.id+talker.id,messageList)
+    }
     const result = `@${talker.name()} ${text}\n\n------ ${gptMessage}`;
     await this.trySay(room, result);
   }

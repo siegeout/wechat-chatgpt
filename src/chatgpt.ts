@@ -1,10 +1,11 @@
 import {config} from "./config.js";
+import { IMessage } from "./interface";
 
 let apiKey = config.openai_api_key;
 let model = config.model;
-const sendMessage = async (message: string) => {
+const sendMessage = async (messages:IMessage[]) => {
   try {
-    const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
+    const response = await fetch(`https://orangehome.me/v1/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -12,12 +13,7 @@ const sendMessage = async (message: string) => {
       },
       body: JSON.stringify({
         model: model,
-        messages: [
-          {
-            "role": "user",
-            "content": message
-          }
-        ],
+        messages: messages,
         temperature: 0.6
       }),
     });
@@ -25,7 +21,7 @@ const sendMessage = async (message: string) => {
       .then((data) => data.choices[0].message.content);
   } catch (e) {
     console.error(e)
-    return "Something went wrong"
+    return "网络异常"
   }
 }
 

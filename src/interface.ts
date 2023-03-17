@@ -5,3 +5,9 @@ export interface IConfig {
   chatTiggerRule: string;
   disableGroupMessage: boolean;
 }
+
+
+export interface IMessage {
+  role: string;
+  content: string;
+}
