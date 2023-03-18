@@ -148,9 +148,9 @@ export class ChatGPTBot {
      gptMessage=gptMessage.trim()
      if (gptMessage!='网络异常'){
        messageList.push({"role": "assistant", "content": gptMessage})
-       if (messageList.length>8){
-         messageList.shift();
-       }
+       // if (messageList.length>8){
+       //   messageList.shift();
+       // }
        messageMap.set(talkerId,messageList)
      }
     }
@@ -176,9 +176,9 @@ export class ChatGPTBot {
      gptMessage=gptMessage.trim()
      if (gptMessage!='网络异常'){
        messageList.push({"role": "assistant", "content": gptMessage})
-       if (messageList.length>8){
-         messageList.shift();
-       }
+       // if (messageList.length>8){
+       //   messageList.shift();
+       // }
        messageMap.set(room.id+talker.id,messageList)
       }
     }
