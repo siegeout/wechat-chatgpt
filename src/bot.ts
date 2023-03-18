@@ -135,18 +135,24 @@ export class ChatGPTBot {
   async onPrivateMessage(talker: ContactInterface, text: string) {
     const talkerId = talker.id;
     let messageList=messageMap.get(talkerId)
-    if (!messageList) {
-       messageList= [];
-    }
-    messageList.push({"role": "user", "content": text})
-    let gptMessage = await this.getGPTMessage(messageList);
-    gptMessage=gptMessage.trim()
-    if (gptMessage!='网络异常'){
-      messageList.push({"role": "assistant", "content": gptMessage})
-      if (messageList.length>8){
-        messageList.shift();
-      }
+    let gptMessage='已重置'
+    if (text=='重置'){
+      messageList=[]
       messageMap.set(talkerId,messageList)
+    }else{
+      if (!messageList) {
+        messageList= [];
+     }
+     messageList.push({"role": "user", "content": text})
+     gptMessage = await this.getGPTMessage(messageList);
+     gptMessage=gptMessage.trim()
+     if (gptMessage!='网络异常'){
+       messageList.push({"role": "assistant", "content": gptMessage})
+       if (messageList.length>8){
+         messageList.shift();
+       }
+       messageMap.set(talkerId,messageList)
+     }
     }
     await this.trySay(talker, gptMessage);
   }
@@ -157,18 +163,24 @@ export class ChatGPTBot {
     room: RoomInterface
   ) {
     let messageList=messageMap.get(room.id+talker.id)
-    if (!messageList) {
-      messageList= [];
-    }
-    messageList.push({"role": "user", "content": text})
-    let gptMessage = await this.getGPTMessage(messageList);
-    gptMessage=gptMessage.trim()
-    if (gptMessage!='网络异常'){
-      messageList.push({"role": "assistant", "content": gptMessage})
-      if (messageList.length>8){
-        messageList.shift();
-      }
+    let gptMessage='已重置'
+    if (text=='重置'){
+      messageList=[]
       messageMap.set(room.id+talker.id,messageList)
+    }else{
+      if (!messageList) {
+        messageList= [];
+     }
+     messageList.push({"role": "user", "content": text})
+     gptMessage = await this.getGPTMessage(messageList);
+     gptMessage=gptMessage.trim()
+     if (gptMessage!='网络异常'){
+       messageList.push({"role": "assistant", "content": gptMessage})
+       if (messageList.length>8){
+         messageList.shift();
+       }
+       messageMap.set(room.id+talker.id,messageList)
+      }
     }
     const result = `@${talker.name()} ${text}\n\n------ ${gptMessage}`;
     await this.trySay(room, result);

@@ -4,6 +4,7 @@ import { IMessage } from "./interface";
 let apiKey = config.openai_api_key;
 let model = config.model;
 const sendMessage = async (messages:IMessage[]) => {
+  console.log(messages)
   try {
     const response = await fetch(`https://orangehome.me/v1/chat/completions`, {
       method: "POST",
