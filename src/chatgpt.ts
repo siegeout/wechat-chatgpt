@@ -22,7 +22,7 @@ const sendMessage = async (messages:IMessage[]) => {
       .then((data) => data.choices[0].message.content);
   } catch (e) {
     console.error(e)
-    return "网络异常"
+    return "网络异常,请稍后重试"
   }
 }
 
