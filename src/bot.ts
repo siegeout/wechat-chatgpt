@@ -148,15 +148,24 @@ export class ChatGPTBot {
      gptMessage=gptMessage.trim()
      if (gptMessage!='网络异常,请稍后重试'){
        messageList.push({"role": "assistant", "content": gptMessage})
-       // if (messageList.length>8){
-       //   messageList.shift();
-       // }
+       this.dealMessage(messageList)
        messageMap.set(talkerId,messageList)
+     }else{
+       messageList.shift();
      }
     }
     await this.trySay(talker, gptMessage);
   }
 
+  dealMessage(messageList:IMessage[]){
+    const serialized_data = JSON.stringify(messageList)
+    if (serialized_data.length>4500){
+      let top= messageList.shift();
+      if (top!=undefined){
+        console.log(`🎯 remove message: ${top.content}`);
+      }
+    }
+  }
   async onGroupMessage(
     talker: ContactInterface,
     text: string,
@@ -176,11 +185,11 @@ export class ChatGPTBot {
      gptMessage=gptMessage.trim()
      if (gptMessage!='网络异常,请稍后重试'){
        messageList.push({"role": "assistant", "content": gptMessage})
-       // if (messageList.length>8){
-       //   messageList.shift();
-       // }
+       this.dealMessage(messageList)
        messageMap.set(room.id+talker.id,messageList)
-      }
+      }else {
+         messageList.shift();
+     }
     }
     const result = `@${talker.name()} ${text}\n\n------ ${gptMessage}`;
     await this.trySay(room, result);
