@@ -174,7 +174,7 @@ export class ChatGPTBot {
      messageList.push({"role": "user", "content": text})
      gptMessage = await this.getGPTMessage(messageList);
      gptMessage=gptMessage.trim()
-     if (gptMessage!='网络异常'){
+     if (gptMessage!='网络异常,请重试'){
        messageList.push({"role": "assistant", "content": gptMessage})
        // if (messageList.length>8){
        //   messageList.shift();
